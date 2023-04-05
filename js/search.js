@@ -1,7 +1,4 @@
-<head>
-<script type="text/javascript" src="js/search.js" defer></script>
-
-</head>
+type="text/javascript"; src="js/search.js"; 
 
 document.getElementById("search_btn").addEventListener('click', search_message);
 
