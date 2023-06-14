@@ -9,6 +9,11 @@ addJavascript('/js/security.js'); // 암복호화 함수
 addJavascript('/js/session.js'); // 세션 함수
 addJavascript('/js/cookie.js'); // 쿠키 함수	
 
+function keepSession() {
+  setCookie('session', 'active', 5/1440); // 5분 유지 (5분 = 5/1440)
+  setTimeout(logout, 5 * 60 * 1000); // 5분 후 자동 로그아웃
+}
+
 function init(){ // 로그인 폼에 쿠키에서 가져온 아이디 입력
     let id = document.querySelector("#floatingInput");
     let check = document.querySelector("#idSaveCheck");
@@ -19,7 +24,7 @@ function init(){ // 로그인 폼에 쿠키에서 가져온 아이디 입력
 	session_check(); // 세션 유무 검사
 }
 
-function login(){ // 로그인
+/*--function login(){ // 로그인
     let form = document.querySelector("#form_main");
     let id = document.querySelector("#floatingInput");
     let password = document.querySelector("#floatingPassword");
@@ -43,6 +48,35 @@ function login(){ // 로그인
 		session_set(); // 세션 생성
         form.submit();
     }
+}--*/
+function login() {
+  let form = document.querySelector("#form_main");
+  let id = document.querySelector("#floatingInput");
+  let password = document.querySelector("#floatingPassword");
+  let check = document.querySelector("#idSaveCheck");
+
+  form.action = "index_login.html";
+  form.method = "get";
+
+  if (check.checked == true) {
+    alert("쿠키를 저장합니다.");
+    setCookie("id", id.value, 5/1440); // 5분 유지
+    alert("쿠키 값: " + id.value);
+  } else {
+    setCookie("id", id.value, 0);
+  }
+
+  if (id.value.length === 0 || password.value.length === 0) {
+    alert("아이디와 비밀번호를 모두 입력해주세요.");
+  } else if (!login_check(id.value, password.value)) {
+    alert("올바른 이메일과 패스워드 형식을 입력해주세요.");
+  } else {
+    form.action = "../index_login.html";
+    form.method = "get";
+    session_set();
+    form.submit();   
+    keepSession();
+  }
 }
 
 function logout(){ //로그아웃
@@ -94,3 +128,23 @@ function logout_count() {
     }
     setCookie("logout_cnt", count, 365); // 1년 동안 유지되는 쿠키 설정
 }
+
+function login_check(email, password)
+   {
+    const emailRegex = /^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/;
+    const passwordRegex = /^(?=.[A-Za-z])(?=.\d)(?=.[@!%#?&])[A-Za-z\d@!%*#?&]{8,}$/;
+
+    if (!emailRegex.test(email))
+   {
+    return false;
+    }
+
+    if (!passwordRegex.test(password))
+   {
+   return false;
+   }
+    return true;
+   }
+// 로그인 횟수 쿠키 저장 함수
+// 로그인카운트
+
